@@ -26,15 +26,19 @@ class Solution:
     def solve(self):
         M = {'red': 12, 'green': 13, 'blue': 14}
         possibles = []
+        powers = []
         for game, rolls in self.data:
             no = False
+            m = {'red': 0, 'green': 0, 'blue': 0}
             for rset in rolls:
                 count, colour = re.search(r'([0-9]*) (red|green|blue)', rset).groups()
+                m[colour] = max(m[colour], int(count))
                 if M[colour] < int(count):
                     no = True
-                    break
             if not no: possibles.append(int(game))
+            powers.append(m['blue'] * m['green'] * m['red'])
         self.ans1 = sum(possibles)
+        self.ans2 = sum(powers)
             
 if __name__ == "__main__":
     import sys

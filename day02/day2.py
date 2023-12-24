@@ -16,26 +16,23 @@ class Solution:
         with open(fname) as f:
             data = []
             for line in f.readlines():
-                m = re.search(r"Game ([0-9]*): (.*)", line)
-                game, rolls = m.groups()
-                game_rolls = [g.strip() for s in rolls.split(";") for g in s.strip().split(",")]
-                #[[g.strip() for g in s.strip().split(",")] for s in rolls.split(";")]
-                data.append((game, game_rolls))
+                rolls = re.findall(r"([0-9]*) (red|blue|green)", line)
+                game_rolls = [(int(count), col) for count, col in rolls]
+                data.append(game_rolls)
             return data
                     
     def solve(self):
         M = {'red': 12, 'green': 13, 'blue': 14}
         possibles = []
         powers = []
-        for game, rolls in self.data:
-            no = False
+        for game_idx, rolls in enumerate(self.data):
+            impossible = False
             m = {'red': 0, 'green': 0, 'blue': 0}
-            for rset in rolls:
-                count, colour = re.search(r'([0-9]*) (red|green|blue)', rset).groups()
-                m[colour] = max(m[colour], int(count))
-                if M[colour] < int(count):
-                    no = True
-            if not no: possibles.append(int(game))
+            for count, colour in rolls:
+                m[colour] = max(m[colour], count)
+                if M[colour] < count:
+                    impossible = True
+            if not impossible: possibles.append(game_idx + 1)
             powers.append(m['blue'] * m['green'] * m['red'])
         self.ans1 = sum(possibles)
         self.ans2 = sum(powers)
